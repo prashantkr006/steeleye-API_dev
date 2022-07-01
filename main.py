@@ -3,6 +3,5 @@ from fastapi import FastAPI
 app = FastAPI()
 
 @app.get("/")
-async def root():
-    return {"name":"prashant",
-            "age":"22"}
+async def trades():
+	return "trades list"
