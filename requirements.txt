@@ -1,2 +1,4 @@
-fastapi[all]
-uvicorn[standard]
+fastapi[all]~=0.78.0
+sqlalchemy~=1.4.39
+
+pydantic~=1.9.1
