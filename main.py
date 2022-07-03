@@ -20,10 +20,39 @@ def get_db():
         db.close()
 
 
-# rout to return all the trades
+# rout to return all the trades with pagignation
 @app.get("/trades")
-async def get_trades(db: Session = Depends(get_db), limit: Optional[int] = None):
-    return db.query(models.Trade).limit(limit).all()
+async def get_trades(page_num: int = 1, page_size: int = 10, db: Session = Depends(get_db)):
+    trades = db.query(models.Trade).all()
+    start = (page_num - 1) * page_size
+    end = start + page_size
+
+    trades_len = len(trades)
+    response = {
+        "data" : trades[start: end],
+        "total" : trades_len,
+        "count" : page_size,
+        "pagignation" : {
+
+        }
+    }
+
+    if end >= trades_len:
+        response["pagignation"]["next"] = None
+
+        if page_num > 1:
+            response["pagignation"]["previous"] = f'/trades?page_num={page_num-1}&page_size={page_size}'
+        else:
+            response["pagignation"]["previous"] = None
+    else:
+        if page_num > 1:
+            response["pagignation"]["previous"] = f'/trades?page_num={page_num-1}&page_size={page_size}'
+        else:
+            response["pagignation"]["previous"] = None
+
+        response["pagignation"]["next"] = f'/trades?page_num={page_num+1}&page_size={page_size}'
+
+    return response
 
 
 @app.get("/trades/{trade_id}")
