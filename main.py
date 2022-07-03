@@ -31,12 +31,15 @@ async def get_single_trade(trade_id: str, db: Session = Depends(get_db)):
     return db.query(models.Trade).filter(models.Trade.trade_id == trade_id).first()
 
 
-# @app.get("/search")
-# async def search_trades(counterparty: str, instrumentId: str, instrumentName: str, trader: str,
-#                         db: Session = Depends(get_db)):
-#     return db.query(models.Trade).filter(
-#         models.Trade.counterparty == counterparty and models.Trade.instrument_id == instrumentId and
-#         models.Trade.instrument_name == instrumentName and models.Trade.trader == trader)
+# route to search
+@app.get("/search")
+async def search_trades(counterparty: str, instrument_name: str,
+                        instrument_id: str, trader: str,
+                        db: Session = Depends(get_db)):
+    return db.query(models.Trade).filter(models.Trade.counterparty == counterparty and
+                                         models.Trade.instrument_name == instrument_name and
+                                         models.Trade.instrument_id == instrument_id and
+                                         models.Trade.trader == trader).first()
 
 
 # route to create trade
