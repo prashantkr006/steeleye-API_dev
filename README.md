@@ -70,3 +70,7 @@ to test the working features of app visit here: http://127.0.0.1:8000/docs#/
 
     with SQLAchemy Query filtered out the data from database and responded it to the client
     ```db.query(models.Trade).filter(models.Trade.counterparty == counterparty and models.Trade.instrument_name == instrument_name and models.Trade.instrument_id == instrument_id and models.Trade.trader == trader).first()```
+
+
+## extras
+added responses for the api end points by handling exception & status code
