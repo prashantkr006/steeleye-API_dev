@@ -12,6 +12,10 @@ from math import ceil
 
 from fastapi import FastAPI, Depends, Query
 
+<<<<<<< HEAD
+=======
+from fastapi import FastAPI, Depends, Response, status
+>>>>>>> 2efc7f5213832c135d674d517c26de9793c0fcd6
 
 app = FastAPI()
 
@@ -27,6 +31,7 @@ def get_db():
         db.close()
 
 
+<<<<<<< HEAD
 # rout to return all the trades with pagination feature
 @app.get("/trades")
 async def get_trades(limit:Union[int,None] = Query(
@@ -141,18 +146,79 @@ async def get_trades(assetClass:Union[str,None] = Query(
    
     
 
+=======
+# rout to return all the trades with pagignation
+@app.get("/trades")
+async def get_trades(page_num: int = 1, page_size: int = 10, db: Session = Depends(get_db)):
+    trades = db.query(models.Trade).all()
+    start = (page_num - 1) * page_size
+    end = start + page_size
+>>>>>>> 2efc7f5213832c135d674d517c26de9793c0fcd6
 
+    trades_len = len(trades)
+    response = {
+        "data": trades[start: end],
+        "total": trades_len,
+        "count": page_size,
+        "pagignation": {
 
+<<<<<<< HEAD
 @app.get("/trades/{trade_id}")
 async def get_single_trade(trade_id: str, db: Session = Depends(get_db)):
     # return db.query(models.Trade).join(models.TradeDetails, models.TradeDetails.id ==trade_id).first()
     # return db.query(models.Trade).filter(models.Trade.trade_details.has(id=trade_id)).first()
     db.query(models.Trade).filter(models.Trade.trade_details.id==trade_id).first()
 
+=======
+        }
+    }
+
+    if end >= trades_len:
+        response["pagignation"]["next"] = None
+
+        if page_num > 1:
+            response["pagignation"]["previous"] = f'/trades?page_num={page_num - 1}&page_size={page_size}'
+        else:
+            response["pagignation"]["previous"] = None
+    else:
+        if page_num > 1:
+            response["pagignation"]["previous"] = f'/trades?page_num={page_num - 1}&page_size={page_size}'
+        else:
+            response["pagignation"]["previous"] = None
+
+        response["pagignation"]["next"] = f'/trades?page_num={page_num + 1}&page_size={page_size}'
+
+    return response
+
+
+@app.get("/trades/{trade_id}", status_code=status.HTTP_200_OK)
+async def get_single_trade(response: Response, trade_id: str, db: Session = Depends(get_db)):
+    trade = db.query(models.Trade).filter(models.Trade.trade_id == trade_id).first()
+
+    if not trade:
+        response.status_code = status.HTTP_404_NOT_FOUND
+        return {"details not found"}
+    return trade
+
+
+# route to search
+@app.get("/search", status_code=status.HTTP_200_OK)
+async def search_trades(response: Response, counterparty: str, instrument_name: str,
+                        instrument_id: str, trader: str,
+                        db: Session = Depends(get_db)):
+    trade = db.query(models.Trade).filter(models.Trade.counterparty == counterparty and
+                                          models.Trade.instrument_name == instrument_name and
+                                          models.Trade.instrument_id == instrument_id and
+                                          models.Trade.trader == trader).first()
+    if not trade:
+        response.status_code = status.HTTP_404_NOT_FOUND
+        return {"details not found"}
+    return trade
+>>>>>>> 2efc7f5213832c135d674d517c26de9793c0fcd6
 
 
 # route to create trade
-@app.post("/trade")
+@app.post("/trade", status_code=status.HTTP_201_CREATED)
 async def create_trade(trades: schemas.Trade, db: Session = Depends(get_db)):
     new_trade_Details = models.TradeDetails(price=trades.trade_details.price,
                                             buySellIndicator=trades.trade_details.buySellIndicator,
