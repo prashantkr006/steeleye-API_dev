@@ -1,5 +1,5 @@
 
-# API Developer Assessment
+# end points using FastAPI
 
 This is an API developed by using [fastApi](https://fastapi.tiangolo.com/) framework. The API here contains
 four end points
